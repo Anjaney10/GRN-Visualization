@@ -116,17 +116,10 @@ if 'df' not in st.session_state:
 # UI
 st.title("Gene Regulatory Network Visualization")
 
-tab1, tab2 = st.tabs(["File Upload", "Direct Input"])
+tab1, tab2 = st.tabs(["Direct Input", "File Upload"])
 
 with tab1:
-    uploaded_file = st.file_uploader("Upload TSV file", type=["tsv", "txt"])
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file, sep="\t")
-        st.session_state.df = df
-        st.dataframe(df.head())
-
-with tab2:
-    example = "Source\tTarget\tType\tCitation\ngeneA\tgeneB\t1\tCitation 1\ngeneB\tgeneC\t2\tCitation 2"
+    example = "Source\tTarget\tType\tCitation\ngeneA\tgeneB\t1\tCitation 1"
     data = st.text_area("Paste TSV data:", value=example, height=200)
     if st.button("Parse Input"):
         try:
@@ -135,6 +128,13 @@ with tab2:
             st.dataframe(df.head())
         except Exception as e:
             st.error(f"Error parsing data: {e}")
+
+with tab2:
+    uploaded_file = st.file_uploader("Upload TSV file", type=["tsv", "txt"])
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file, sep="\t")
+        st.session_state.df = df
+        st.dataframe(df.head())
 
 # Visualization section
 if st.session_state.df is not None:
