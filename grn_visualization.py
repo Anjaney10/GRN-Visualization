@@ -12,10 +12,8 @@ def load_predefined_dataset(dataset_name):
         file_path = "trrust_rawdata.human.tsv"
         if os.path.exists(file_path):
             try:
-                # Read the file without headers
                 df = pd.read_csv(file_path, sep="\t", header=None)
                 df.columns = ["Source", "Target", "Type", "Citation"]
-                # Ensure Type is numeric
                 df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(0).astype(int)
                 return df
             except Exception as e:
@@ -26,12 +24,13 @@ def load_predefined_dataset(dataset_name):
             return None
             
     elif dataset_name == "RegNetwork Human":
-        file_path = "RegNetwork.tsv"
+        file_path = "RegNetwork.txt"
         if os.path.exists(file_path):
             try:
+                # Convert spaces to tabs if necessary
+                convert_spaces_to_tabs(file_path)
                 # Read the file without headers
                 df = pd.read_csv(file_path, sep="\t", header=None)
-                # Rename columns if needed
                 if len(df.columns) == 3:
                     df.columns = ["Source", "Target", "Type"]
                 elif len(df.columns) == 4:
@@ -39,7 +38,6 @@ def load_predefined_dataset(dataset_name):
                 else:
                     st.error("Unexpected number of columns in RegNetwork file")
                     return None
-                # Ensure Type is numeric
                 df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(0).astype(int)
                 return df
             except Exception as e:
@@ -50,6 +48,15 @@ def load_predefined_dataset(dataset_name):
             return None
     
     return None
+
+def convert_spaces_to_tabs(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    with open(file_path, 'w') as file:
+        for line in lines:
+            # Replace multiple spaces with a single tab
+            file.write('\t'.join(line.split()))
 
 # Function to find interaction between specific genes
 def find_gene_interaction(source, target, dataset_name):
@@ -209,6 +216,11 @@ with tab3:
         else:
             st.error("Failed to load the dataset.")
     
+    # Add a button to remove the dataset
+    if st.button("Remove Dataset"):
+        st.session_state.df = None
+        st.success("Dataset removed successfully.")
+    
     # Gene interaction search section
     st.subheader("Search Gene Interaction")
     col1, col2, col3 = st.columns([2, 2, 1])
@@ -311,8 +323,8 @@ if st.session_state.df is not None:
                         break
                 
                 # If edge exists, replace it
-                if existing_edge_index is not None:
-                    st.session_state.added_edges[existing_edge_index] = (source, target, edge_type_val)
+                if existing edge_index is not None:
+                    st.session_state.added_edges[existing edge_index] = (source, target, edge_type_val)
                     st.success(f"Updated edge: {source} -> {target} to {edge_type}")
                 # Otherwise add as new edge
                 else:
