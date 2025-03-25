@@ -26,9 +26,6 @@ def load_predefined_dataset(dataset_name):
     elif dataset_name == "RegNetwork Human":
         file_path = "RegNetwork.txt"
         if os.path.exists(file_path):
-            try:
-                # Convert spaces to tabs if necessary
-                convert_spaces_to_tabs(file_path)
                 # Read the file without headers
                 df = pd.read_csv(file_path, sep="\t", header=None)
                 if len(df.columns) == 3:
@@ -48,15 +45,6 @@ def load_predefined_dataset(dataset_name):
             return None
     
     return None
-
-def convert_spaces_to_tabs(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-
-    with open(file_path, 'w') as file:
-        for line in lines:
-            # Replace multiple spaces with a single tab
-            file.write('\t'.join(line.split()))
 
 # Function to find interaction between specific genes
 def find_gene_interaction(source, target, dataset_name):
