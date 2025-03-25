@@ -34,8 +34,8 @@ def load_predefined_dataset(dataset_name):
             st.error(f"File not found: {file_path}")
             return None
             
-    elif dataset_name == "RegNetwork":
-        file_path = "RegNetwork.tsv"
+    elif dataset_name == "RegNetwork Human":
+        file_path = "RegNetwork.txt"
         convert_spaces_to_tabs(file_path)
         if os.path.exists(file_path):
             try:
