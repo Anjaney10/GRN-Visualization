@@ -432,6 +432,7 @@ st.markdown("""
 3. Click "Generate Network" to visualize
 4. Add new nodes and edges as needed
 5. Network will update when you regenerate it
+6. Interactions are defined as: Activation (1), Inhibition (2) and Unknown (0)
 
 ### About the predefined datasets:
 - **TRRUST Human**: Transcriptional regulatory relationships in humans
