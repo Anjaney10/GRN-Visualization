@@ -302,44 +302,44 @@ if st.session_state.df is not None:
                     st.rerun()
     
     with col2:
-    st.write("Add a new edge")
-    
-    # Get all available nodes
-    all_nodes = st.session_state.network_nodes + st.session_state.added_nodes if 'network_nodes' in st.session_state else st.session_state.added_nodes
-    
-    if all_nodes:
-        source = st.selectbox("Source node:", all_nodes, key="source")
-        target = st.selectbox("Target node:", [n for n in all_nodes if n != source], key="target")
-        edge_type = st.radio("Edge type:", ["Activation (1)", "Inhibition (2)"], key="edge_type")
+        st.write("Add a new edge")
         
-        edge_type_val = 1 if edge_type == "Activation (1)" else 2
+        # Get all available nodes
+        all_nodes = st.session_state.network_nodes + st.session_state.added_nodes if 'network_nodes' in st.session_state else st.session_state.added_nodes
         
-        if st.button("Add Edge", key="add_edge"):
-            # Check if an edge between these nodes already exists
-            existing_edge_index = None
-            for i, (s, t, _) in enumerate(st.session_state.added_edges):
-                if s == source and t == target:
-                    existing_edge_index = i
-                    break
+        if all_nodes:
+            source = st.selectbox("Source node:", all_nodes, key="source")
+            target = st.selectbox("Target node:", [n for n in all_nodes if n != source], key="target")
+            edge_type = st.radio("Edge type:", ["Activation (1)", "Inhibition (2)"], key="edge_type")
             
-            # If edge exists, replace it
-            if existing_edge_index is not None:
-                st.session_state.added_edges[existing_edge_index] = (source, target, edge_type_val)
-                st.success(f"Updated edge: {source} -> {target} to {edge_type}")
-            # Otherwise add as new edge
-            else:
-                st.session_state.added_edges.append((source, target, edge_type_val))
-                st.success(f"Added edge: {source} -> {target} ({edge_type})")
+            edge_type_val = 1 if edge_type == "Activation (1)" else 2
             
-            # Regenerate the network
-            if st.session_state.df is not None:
-                net, _ = draw_network(st.session_state.df)
-                net.save_graph("network.html")
-                with open("network.html", 'r', encoding='utf-8') as f:
-                    html_content = f.read()
-                st.rerun()
-    else:
-        st.warning("No nodes available. Please add nodes first.")
+            if st.button("Add Edge", key="add_edge"):
+                # Check if an edge between these nodes already exists
+                existing_edge_index = None
+                for i, (s, t, _) in enumerate(st.session_state.added_edges):
+                    if s == source and t == target:
+                        existing_edge_index = i
+                        break
+                
+                # If edge exists, replace it
+                if existing_edge_index is not None:
+                    st.session_state.added_edges[existing_edge_index] = (source, target, edge_type_val)
+                    st.success(f"Updated edge: {source} -> {target} to {edge_type}")
+                # Otherwise add as new edge
+                else:
+                    st.session_state.added_edges.append((source, target, edge_type_val))
+                    st.success(f"Added edge: {source} -> {target} ({edge_type})")
+                
+                # Regenerate the network
+                if st.session_state.df is not None:
+                    net, _ = draw_network(st.session_state.df)
+                    net.save_graph("network.html")
+                    with open("network.html", 'r', encoding='utf-8') as f:
+                        html_content = f.read()
+                    st.rerun()
+        else:
+            st.warning("No nodes available. Please add nodes first.")
     
 # Display current added nodes and edges
 if st.session_state.added_nodes or st.session_state.added_edges:
