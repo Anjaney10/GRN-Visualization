@@ -26,6 +26,7 @@ def load_predefined_dataset(dataset_name):
     elif dataset_name == "RegNetwork Human":
         file_path = "RegNetwork.txt"
         if os.path.exists(file_path):
+            try:
                 # Read the file without headers
                 df = pd.read_csv(file_path, sep="\t", header=None)
                 if len(df.columns) == 3:
