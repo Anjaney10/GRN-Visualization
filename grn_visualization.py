@@ -245,7 +245,7 @@ with tab3:
             else:
                 st.warning(f"No interaction found between {lookup_source} and {lookup_target} in {lookup_dataset}.")
         else:
-            st.warning("Please enter both source and target genes.").
+            st.warning("Please enter both source and target genes.")
 
 # Visualization section
 if st.session_state.df is not None:
