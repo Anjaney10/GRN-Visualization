@@ -54,7 +54,15 @@ def find_gene_interaction(source, target, dataset_name):
         return None
     
     # Look for exact matches
-    interactions = df[(df["Source"] == source) & (df["Target"] == target)]
+    if source and target:
+        interactions = df[(df["Source"] == source) & (df["Target"] == target)]
+    elif source:
+        interactions = df[df["Source"] == source]
+    elif target:
+        interactions = df[df["Target"] == target]
+    else:
+        return None
+
     return interactions if not interactions.empty else None
 
 # Function to draw the network
@@ -226,10 +234,15 @@ with tab3:
         )
     
     if st.button("Find Interaction", key="find_interaction"):
-        if lookup_source and lookup_target:
+        if lookup_source or lookup_target:
             interaction = find_gene_interaction(lookup_source, lookup_target, lookup_dataset)
             if interaction is not None:
-                st.success(f"Found interaction between {lookup_source} and {lookup_target}")
+                if not lookup_source:
+                    st.success(f"Found interactions for target gene {lookup_target}")
+                elif not lookup_target:
+                    st.success(f"Found interactions for source gene {lookup_source}")
+                else:
+                    st.success(f"Found interaction between {lookup_source} and {lookup_target}")
                 st.dataframe(interaction)
                 
                 # Add to current network
@@ -249,9 +262,9 @@ with tab3:
                 
                 st.info("Press 'Generate Network' to update the visualization.")
             else:
-                st.warning(f"No interaction found between {lookup_source} and {lookup_target} in {lookup_dataset}.")
+                st.warning(f"No interactions found for the given input in {lookup_dataset}.")
         else:
-            st.warning("Please enter both source and target genes.")
+            st.warning("Please enter either a source or a target gene.")
 
 # Visualization section
 if st.session_state.df is not None:
