@@ -24,7 +24,7 @@ def load_predefined_dataset(dataset_name):
             return None
             
     elif dataset_name == "RegNetwork Human":
-        file_path = "RegNetwork.txt"
+        file_path = "RegNetwork.tsv"
         if os.path.exists(file_path):
             try:
                 # Convert spaces to tabs if necessary
