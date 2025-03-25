@@ -7,6 +7,7 @@ import json
 import os
 
 # Function to load predefined datasets
+# Function to load predefined datasets
 def load_predefined_dataset(dataset_name):
     if dataset_name == "TRRUST Human":
         file_path = "trrust_rawdata.human.tsv"
@@ -30,11 +31,9 @@ def load_predefined_dataset(dataset_name):
         if os.path.exists(file_path):
             try:
                 # Assuming format similar to TRRUST
-                df = pd.read_csv(file_path, sep="\t")
-                # Make sure it has the required columns
-                if "Source" not in df.columns or "Target" not in df.columns:
-                    # Rename columns if needed
-                    df.columns = ["Source", "Target", "Type", "Citation"] if len(df.columns) >= 4 else ["Source", "Target", "Type"]
+                df = pd.read_csv(file_path, sep="\t", header=None)
+                # Rename columns if needed
+                df.columns = ["Source", "Target", "Type", "Citation"] if len(df.columns) >= 4 else ["Source", "Target", "Type"]
                 # Ensure Type is numeric
                 if "Type" in df.columns:
                     df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(1).astype(int)
@@ -203,6 +202,8 @@ with tab3:
             st.session_state.df = df
             st.success(f"Loaded {dataset_option} dataset with {len(df)} interactions")
             st.dataframe(df.head())
+        else:
+            st.error("Failed to load the dataset.")
     
     # Gene interaction search section
     st.subheader("Search Gene Interaction")
