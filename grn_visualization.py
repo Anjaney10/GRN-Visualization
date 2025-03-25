@@ -333,34 +333,45 @@ if st.session_state.df is not None:
             
             edge_type_val = 1 if edge_type == "Activation (1)" else 2
             
-            if st.button("Add Edge", key="add_edge"):
-                # Check if an edge between these nodes already exists
-                existing_edge_index = None
-                for i, (s, t, _) in enumerate(st.session_state.added_edges):
-                    if s == source and t == target:
-                        existing_edge_index = i
-                        break
-                
-                # If edge exists, replace it
-                if existing_edge_index is not None:
-                    st.session_state.added_edges[existing_edge_index] = (source, target, edge_type_val)
-                    st.success(f"Updated edge: {source} -> {target} to {edge_type}")
-                # Otherwise add as new edge
-                else:
-                    st.session_state.added_edges.append((source, target, edge_type_val))
-                    st.success(f"Added edge: {source} -> {target} ({edge_type})")
-                
-                # Regenerate the network
-                if st.session_state.df is not None:
-                    try:
-                        net, _ = draw_network(st.session_state.df)
-                        net.save_graph("network.html")
-                        with open("network.html", 'r', encoding='utf-8') as f:
-                            html_content = f.read()
-                        st.components.v1.html(html_content, height=750, width=1000)
-                    except Exception as e:
-                        st.error(f"Error generating network: {e}")
-                    st.rerun()
+            col3, col4 = st.columns(2)
+            
+            with col3:
+                if st.button("Add Edge", key="add_edge"):
+                    # Check if an edge between these nodes already exists
+                    existing_edge_index = None
+                    for i, (s, t, _) in enumerate(st.session_state.added_edges):
+                        if s == source and t == target:
+                            existing_edge_index = i
+                            break
+                    
+                    # If edge exists, replace it
+                    if existing_edge_index is not None:
+                        st.session_state.added_edges[existing_edge_index] = (source, target, edge_type_val)
+                        st.success(f"Updated edge: {source} -> {target} to {edge_type}")
+                    # Otherwise add as new edge
+                    else:
+                        st.session_state.added_edges.append((source, target, edge_type_val))
+                        st.success(f"Added edge: {source} -> {target} ({edge_type})")
+                    
+                    # Regenerate the network
+                    if st.session_state.df is not None:
+                        try:
+                            net, _ = draw_network(st.session_state.df)
+                            net.save_graph("network.html")
+                            with open("network.html", 'r', encoding='utf-8') as f:
+                                html_content = f.read()
+                            st.components.v1.html(html_content, height=750, width=1000)
+                        except Exception as e:
+                            st.error(f"Error generating network: {e}")
+                        st.rerun()
+            
+            with col4:
+                if st.button("Remove Edge", key="remove_edge"):
+                    if remove_edge(source, target):
+                        st.success(f"Removed edge: {source} -> {target}")
+                        st.rerun()
+                    else:
+                        st.warning(f"No such edge: {source} -> {target}")
         else:
             st.warning("No nodes available. Please add nodes first.")
     
