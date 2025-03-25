@@ -165,6 +165,20 @@ def draw_network(df, include_add_tools=False):
     
     return net, G
 
+# Define the remove_edge function
+def remove_edge(source, target):
+    # Find the index of the edge to remove
+    edge_index = None
+    for i, (s, t, _) in enumerate(st.session_state.added_edges):
+        if s == source and t == target:
+            edge_index = i
+            break
+    # Remove the edge if found
+    if edge_index is not None:
+        del st.session_state.added_edges[edge_index]
+        return True
+    return False
+
 # Initialize session state
 if 'added_nodes' not in st.session_state:
     st.session_state.added_nodes = []
@@ -315,7 +329,7 @@ if st.session_state.df is not None:
         
         if all_nodes:
             source = st.selectbox("Source node:", all_nodes, key="source")
-            target = st.selectbox("Target node:", [n for n in all_nodes if n != source], key="target")
+            target = st.selectbox("Target node:", all_nodes, key="target")  # Allow self-loops by using all_nodes for target as well
             edge_type = st.radio("Edge type:", ["Activation (1)", "Inhibition (2)"], key="edge_type")
             
             edge_type_val = 1 if edge_type == "Activation (1)" else 2
