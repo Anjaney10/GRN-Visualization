@@ -32,7 +32,13 @@ def load_predefined_dataset(dataset_name):
                 # Read the file without headers
                 df = pd.read_csv(file_path, sep="\t", header=None)
                 # Rename columns if needed
-                df.columns = ["Source", "Target", "Type", "Citation"] if len(df.columns) >= 4 else ["Source", "Target", "Type"]
+                if len(df.columns) == 3:
+                    df.columns = ["Source", "Target", "Type"]
+                elif len(df.columns) == 4:
+                    df.columns = ["Source", "Target", "Type", "Citation"]
+                else:
+                    st.error("Unexpected number of columns in RegNetwork file")
+                    return None
                 # Ensure Type is numeric
                 df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(0).astype(int)
                 return df
