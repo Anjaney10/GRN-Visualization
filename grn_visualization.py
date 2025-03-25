@@ -310,10 +310,14 @@ if st.session_state.df is not None:
                 st.success(f"Added node: {new_node}")
                 # Regenerate the network
                 if st.session_state.df is not None:
-                    net, _ = draw_network(st.session_state.df)
-                    net.save_graph("network.html")
-                    with open("network.html", 'r', encoding='utf-8') as f:
-                        html_content = f.read()
+                    try:
+                        net, _ = draw_network(st.session_state.df)
+                        net.save_graph("network.html")
+                        with open("network.html", 'r', encoding='utf-8') as f:
+                            html_content = f.read()
+                        st.components.v1.html(html_content, height=750, width=1000)
+                    except Exception as e:
+                        st.error(f"Error generating network: {e}")
                     st.rerun()
     
     with col2:
@@ -348,10 +352,14 @@ if st.session_state.df is not None:
                 
                 # Regenerate the network
                 if st.session_state.df is not None:
-                    net, _ = draw_network(st.session_state.df)
-                    net.save_graph("network.html")
-                    with open("network.html", 'r', encoding='utf-8') as f:
-                        html_content = f.read()
+                    try:
+                        net, _ = draw_network(st.session_state.df)
+                        net.save_graph("network.html")
+                        with open("network.html", 'r', encoding='utf-8') as f:
+                            html_content = f.read()
+                        st.components.v1.html(html_content, height=750, width=1000)
+                    except Exception as e:
+                        st.error(f"Error generating network: {e}")
                     st.rerun()
         else:
             st.warning("No nodes available. Please add nodes first.")
