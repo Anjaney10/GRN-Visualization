@@ -7,17 +7,16 @@ import json
 import os
 
 # Function to load predefined datasets
-# Function to load predefined datasets
 def load_predefined_dataset(dataset_name):
     if dataset_name == "TRRUST Human":
         file_path = "trrust_rawdata.human.tsv"
         if os.path.exists(file_path):
             try:
-                # TRRUST format: TF Gene Interaction PubMed_ID
+                # Read the file without headers
                 df = pd.read_csv(file_path, sep="\t", header=None)
                 df.columns = ["Source", "Target", "Type", "Citation"]
-                # Convert interaction types to numeric (1 for activation, 2 for inhibition)
-                df["Type"] = df["Type"].map({"Activation": 1, "Repression": 2})
+                # Ensure Type is numeric
+                df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(0).astype(int)
                 return df
             except Exception as e:
                 st.error(f"Error loading TRRUST dataset: {e}")
@@ -30,13 +29,12 @@ def load_predefined_dataset(dataset_name):
         file_path = "new_kegg.human.reg.direction.tsv"
         if os.path.exists(file_path):
             try:
-                # Assuming format similar to TRRUST
+                # Read the file without headers
                 df = pd.read_csv(file_path, sep="\t", header=None)
                 # Rename columns if needed
                 df.columns = ["Source", "Target", "Type", "Citation"] if len(df.columns) >= 4 else ["Source", "Target", "Type"]
                 # Ensure Type is numeric
-                if "Type" in df.columns:
-                    df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(1).astype(int)
+                df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(0).astype(int)
                 return df
             except Exception as e:
                 st.error(f"Error loading RegNetwork dataset: {e}")
