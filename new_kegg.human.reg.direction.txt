@@ -1,4 +1,4 @@
-Source	Target	Interaction	Citation
+Source	Target	Type	Citation
 AHR	CDKN1B	1	
 APLNR	PIK3C3	1	
 APLNR	PIK3R4	1	
