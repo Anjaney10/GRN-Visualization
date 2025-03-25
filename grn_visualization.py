@@ -4,6 +4,59 @@ import networkx as nx
 from pyvis.network import Network
 import io
 import json
+import os
+
+# Function to load predefined datasets
+def load_predefined_dataset(dataset_name):
+    if dataset_name == "TRRUST Human":
+        file_path = "trrust_rawdata.human.tsv"
+        if os.path.exists(file_path):
+            try:
+                # TRRUST format: TF Gene Interaction PubMed_ID
+                df = pd.read_csv(file_path, sep="\t", header=None)
+                df.columns = ["Source", "Target", "Interaction", "Citation"]
+                # Convert interaction types to numeric (1 for activation, 2 for inhibition)
+                df["Type"] = df["Interaction"].map({"Activation": 1, "Repression": 2})
+                return df
+            except Exception as e:
+                st.error(f"Error loading TRRUST dataset: {e}")
+                return None
+        else:
+            st.error(f"File not found: {file_path}")
+            return None
+            
+    elif dataset_name == "KEGG Human":
+        file_path = "new_kegg.human.reg.direction.txt"
+        if os.path.exists(file_path):
+            try:
+                # Assuming format similar to TRRUST
+                df = pd.read_csv(file_path, sep="\t")
+                # Make sure it has the required columns
+                if "Source" not in df.columns or "Target" not in df.columns:
+                    # Rename columns if needed
+                    df.columns = ["Source", "Target", "Type", "Citation"] if len(df.columns) >= 4 else ["Source", "Target", "Type"]
+                # Ensure Type is numeric
+                if "Type" in df.columns:
+                    df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(1).astype(int)
+                return df
+            except Exception as e:
+                st.error(f"Error loading KEGG dataset: {e}")
+                return None
+        else:
+            st.error(f"File not found: {file_path}")
+            return None
+    
+    return None
+
+# Function to find interaction between specific genes
+def find_gene_interaction(source, target, dataset_name):
+    df = load_predefined_dataset(dataset_name)
+    if df is None:
+        return None
+    
+    # Look for exact matches
+    interactions = df[(df["Source"] == source) & (df["Target"] == target)]
+    return interactions if not interactions.empty else None
 
 # Function to draw the network
 def draw_network(df, include_add_tools=False):
@@ -116,10 +169,17 @@ if 'df' not in st.session_state:
 # UI
 st.title("Gene Regulatory Network Visualization")
 
-tab1, tab2 = st.tabs(["Direct Input", "File Upload"])
+tab1, tab2, tab3 = st.tabs(["File Upload", "Direct Input", "Predefined Datasets"])
 
 with tab1:
-    example = "Source\tTarget\tType\tCitation\ngeneA\tgeneB\t1\tCitation 1"
+    uploaded_file = st.file_uploader("Upload TSV file", type=["tsv", "txt"])
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file, sep="\t")
+        st.session_state.df = df
+        st.dataframe(df.head())
+
+with tab2:
+    example = "Source\tTarget\tType\tCitation\ngeneA\tgeneB\t1\tCitation 1\ngeneB\tgeneC\t2\tCitation 2"
     data = st.text_area("Paste TSV data:", value=example, height=200)
     if st.button("Parse Input"):
         try:
@@ -129,12 +189,63 @@ with tab1:
         except Exception as e:
             st.error(f"Error parsing data: {e}")
 
-with tab2:
-    uploaded_file = st.file_uploader("Upload TSV file", type=["tsv", "txt"])
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file, sep="\t")
-        st.session_state.df = df
-        st.dataframe(df.head())
+with tab3:
+    st.subheader("Predefined Datasets")
+    dataset_option = st.selectbox(
+        "Select dataset:",
+        ["TRRUST Human", "KEGG Human"],
+        key="predefined_dataset"
+    )
+    
+    if st.button("Load Full Dataset"):
+        df = load_predefined_dataset(dataset_option)
+        if df is not None:
+            st.session_state.df = df
+            st.success(f"Loaded {dataset_option} dataset with {len(df)} interactions")
+            st.dataframe(df.head())
+    
+    # Gene interaction search section
+    st.subheader("Search Gene Interaction")
+    col1, col2, col3 = st.columns([2, 2, 1])
+    
+    with col1:
+        lookup_source = st.text_input("Source Gene:", key="lookup_source")
+    with col2:
+        lookup_target = st.text_input("Target Gene:", key="lookup_target")
+    with col3:
+        lookup_dataset = st.selectbox(
+            "Dataset:",
+            ["TRRUST Human", "KEGG Human"],
+            key="lookup_dataset"
+        )
+    
+    if st.button("Find Interaction", key="find_interaction"):
+        if lookup_source and lookup_target:
+            interaction = find_gene_interaction(lookup_source, lookup_target, lookup_dataset)
+            if interaction is not None:
+                st.success(f"Found interaction between {lookup_source} and {lookup_target}")
+                st.dataframe(interaction)
+                
+                # Add to current network
+                if st.session_state.df is None:
+                    st.session_state.df = interaction
+                    st.success("Added to the network.")
+                else:
+                    # Check if interaction already exists
+                    exists = any((st.session_state.df["Source"] == lookup_source) & 
+                                 (st.session_state.df["Target"] == lookup_target))
+                    
+                    if not exists:
+                        st.session_state.df = pd.concat([st.session_state.df, interaction], ignore_index=True)
+                        st.success("Added to the network.")
+                    else:
+                        st.info("This interaction already exists in the network.")
+                
+                st.info("Press 'Generate Network' to update the visualization.")
+            else:
+                st.warning(f"No interaction found between {lookup_source} and {lookup_target} in {lookup_dataset}.")
+        else:
+            st.warning("Please enter both source and target genes.").
 
 # Visualization section
 if st.session_state.df is not None:
@@ -287,10 +398,23 @@ if st.session_state.added_nodes or st.session_state.added_edges:
                 "text/tab-separated-values",
                 key="download-complete"
             )
+
 # Instructions
 st.markdown("""
 ### Instructions:
-1. Upload a TSV file or paste data directly
-2. Click "Generate Network" to visualize
-3. Add new nodes by name
+1. Choose one of the following:
+   - Upload a TSV file
+   - Paste data directly
+   - Use predefined datasets (TRRUST or KEGG Human)
+2. To find specific gene interactions:
+   - Go to the "Predefined Datasets" tab
+   - Enter source and target gene names
+   - Click "Find Interaction"
+3. Click "Generate Network" to visualize
+4. Add new nodes and edges as needed
+5. Network will update when you regenerate it
+
+### About the predefined datasets:
+- **TRRUST Human**: Transcriptional regulatory relationships in humans
+- **KEGG Human**: Gene regulatory relationships from KEGG database
 """)
