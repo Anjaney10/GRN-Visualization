@@ -26,7 +26,7 @@ def load_predefined_dataset(dataset_name):
             return None
             
     elif dataset_name == "RegNetwork":
-        file_path = "new_kegg.human.reg.direction.tsv"
+        file_path = "RegNetwork.tsv"
         if os.path.exists(file_path):
             try:
                 # Read the file without headers
