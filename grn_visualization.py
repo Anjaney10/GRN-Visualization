@@ -6,15 +6,6 @@ import io
 import json
 import os
 
-def convert_spaces_to_tabs(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-
-    with open(file_path, 'w') as file:
-        for line in lines:
-            # Replace multiple spaces with a single tab
-            file.write('\t'.join(line.split()))
-
 # Function to load predefined datasets
 def load_predefined_dataset(dataset_name):
     if dataset_name == "TRRUST Human":
@@ -35,8 +26,7 @@ def load_predefined_dataset(dataset_name):
             return None
             
     elif dataset_name == "RegNetwork Human":
-        file_path = "RegNetwork.txt"
-        convert_spaces_to_tabs(file_path)
+        file_path = "RegNetwork.tsv"
         if os.path.exists(file_path):
             try:
                 # Read the file without headers
