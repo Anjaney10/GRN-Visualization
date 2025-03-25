@@ -26,7 +26,7 @@ def load_predefined_dataset(dataset_name):
             return None
             
     elif dataset_name == "RegNetwork":
-        file_path = "new_kegg.human.reg.direction.txt"
+        file_path = "new_kegg.human.reg.direction.tsv"
         if os.path.exists(file_path):
             try:
                 # Assuming format similar to TRRUST
