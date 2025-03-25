@@ -14,9 +14,9 @@ def load_predefined_dataset(dataset_name):
             try:
                 # TRRUST format: TF Gene Interaction PubMed_ID
                 df = pd.read_csv(file_path, sep="\t", header=None)
-                df.columns = ["Source", "Target", "Interaction", "Citation"]
+                df.columns = ["Source", "Target", "Type", "Citation"]
                 # Convert interaction types to numeric (1 for activation, 2 for inhibition)
-                df["Type"] = df["Interaction"].map({"Activation": 1, "Repression": 2})
+                df["Type"] = df["Type"].map({"Activation": 1, "Repression": 2})
                 return df
             except Exception as e:
                 st.error(f"Error loading TRRUST dataset: {e}")
