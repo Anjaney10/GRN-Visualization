@@ -130,6 +130,20 @@ def draw_network(df, include_add_tools=False):
         
         if 'citation' in edge and edge['citation']:
             edge['title'] = edge['citation']
+
+    
+def remove_edge(source, target):
+    # Find the index of the edge to remove
+    edge_index = None
+    for i, (s, t, _) in enumerate(st.session_state.added_edges):
+        if s == source and t == target:
+            edge_index = i
+            break
+    # Remove the edge if found
+    if edge_index is not None:
+        del st.session_state.added_edges[edge_index]
+        return True
+    return False
     
     # Configure options
     options_str = """
@@ -377,6 +391,18 @@ if st.session_state.added_nodes or st.session_state.added_edges:
                 "text/tab-separated-values",
                 key="download-edges"
             )
+            
+            # Add remove button for each edge
+            for index, row in edge_df.iterrows():
+                source = row['Source']
+                target = row['Target']
+                if st.button(f"Remove {source} -> {target}", key=f"remove_{index}"):
+                    if st.confirm(f"Are you sure you want to remove the edge {source} -> {target}?"):
+                        if remove_edge(source, target):
+                            st.success(f"Removed edge: {source} -> {target}")
+                            st.rerun()
+                        else:
+                            st.error(f"Failed to remove edge: {source} -> {target}")
     
     # Button to create TSV file with all nodes and edges (both original and added)
     if st.button("Generate Complete TSV"):
