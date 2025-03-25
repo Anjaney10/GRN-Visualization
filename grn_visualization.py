@@ -25,7 +25,7 @@ def load_predefined_dataset(dataset_name):
             st.error(f"File not found: {file_path}")
             return None
             
-    elif dataset_name == "KEGG Human":
+    elif dataset_name == "RegNetwork":
         file_path = "new_kegg.human.reg.direction.txt"
         if os.path.exists(file_path):
             try:
@@ -40,7 +40,7 @@ def load_predefined_dataset(dataset_name):
                     df["Type"] = pd.to_numeric(df["Type"], errors="coerce").fillna(1).astype(int)
                 return df
             except Exception as e:
-                st.error(f"Error loading KEGG dataset: {e}")
+                st.error(f"Error loading RegNetwork dataset: {e}")
                 return None
         else:
             st.error(f"File not found: {file_path}")
@@ -193,7 +193,7 @@ with tab3:
     st.subheader("Predefined Datasets")
     dataset_option = st.selectbox(
         "Select dataset:",
-        ["TRRUST Human", "KEGG Human"],
+        ["TRRUST Human", "RegNetwork Human"],
         key="predefined_dataset"
     )
     
@@ -215,7 +215,7 @@ with tab3:
     with col3:
         lookup_dataset = st.selectbox(
             "Dataset:",
-            ["TRRUST Human", "KEGG Human"],
+            ["TRRUST Human", "RegNetwork Human"],
             key="lookup_dataset"
         )
     
@@ -405,7 +405,7 @@ st.markdown("""
 1. Choose one of the following:
    - Upload a TSV file
    - Paste data directly
-   - Use predefined datasets (TRRUST or KEGG Human)
+   - Use predefined datasets (TRRUST or RegNetwork)
 2. To find specific gene interactions:
    - Go to the "Predefined Datasets" tab
    - Enter source and target gene names
@@ -416,5 +416,5 @@ st.markdown("""
 
 ### About the predefined datasets:
 - **TRRUST Human**: Transcriptional regulatory relationships in humans
-- **KEGG Human**: Gene regulatory relationships from KEGG database
+- **RegNetwork Human**: Gene regulatory relationships from RegNetwork database
 """)
