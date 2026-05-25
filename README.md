@@ -63,5 +63,3 @@ We welcome contributions! Please open issues for bug reports, suggestions, or su
 ---
 
 **Contact:** For questions, reach out via [GitHub Issues](https://github.com/Anjaney10/GRN-Visualization/issues).
-
-````
