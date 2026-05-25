@@ -1,6 +1,6 @@
 # GRN-Visualization
 
-GRN-Visualization is an interactive Python application for exploring and visualizing gene regulatory networks (GRNs). It is designed for researchers and enthusiasts working with regulatory genomics, providing easy access to curated biological interaction databases and flexible tools to add, remove, and analyze network components.
+GRN-Visualization is an interactive Python application for exploring and visualizing gene regulatory networks (GRNs). It is designed for researchers working with regulatory genomics, providing easy access to curated biological interaction databases and flexible tools to add, remove, and analyze network components.
 
 ## Features
 
